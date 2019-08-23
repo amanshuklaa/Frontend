@@ -96,12 +96,12 @@ def register():
         password = request.form['password']
         # print(name, lastname, emailaddress,gender,city,country,password)
         if name == '' or emailaddress == '' or password =='' or lastname == '' or gender == '' or city == '' or country == '':
-            return render_template('index.html', message='Please enter required fields')
+            return render_template('signup.html', message='Please enter required fields')
         if db.session.query(Feedback).filter(Feedback.emailaddress == emailaddress).count() == 0:
             data = Feedback(name, lastname, emailaddress, gender,city,country,password)
             db.session.add(data)
             db.session.commit()
-        return render_template('login.html')
+        return render_template('index.html')
     return render_template('index.html', message='You have already register Please login')
  
 
