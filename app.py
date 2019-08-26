@@ -1,6 +1,7 @@
 from flask import Flask, render_template,request
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
+import base64
 
 
 app = Flask(__name__)
@@ -18,8 +19,6 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
-
 
 class Feedback(db.Model):
     __tablename__ = 'cost_information'
@@ -42,6 +41,20 @@ class Feedback(db.Model):
         self.country = country
         self.password = password
 
+class Feedbacks(db.Model):
+    __tablename__ = 'product_information'
+    id = db.Column(db.Integer, primary_key=True)
+    Productname = db.Column(db.String(200), unique=True)
+    image = db.Column(db.String(10000))
+    description = db.Column(db.String(2000))
+    
+
+
+    def __init__(self, Productname, image, description):
+        self.Productname = Productname
+        self.image = image
+        self.description = description
+       
 
 @app.route('/')
 def index():
@@ -117,8 +130,19 @@ def login():
         if user.password == userpas:
             return render_template('login.html')
         # print(user)
-        
-    return 'user doesnot exist '
+
+@app.route('/addproduct',methods= ['POST'])
+def addProduc():
+    productname =  request.form['productname']
+    imagefile = request.files['uploadimage']
+    image_string = base64.b64encode(imagefile.read())
+    description=  request.form['discription']
+    print(productname,image_string,description)
+
+    data = Feedbacks(productname, image_string, description)
+    db.session.add(data)
+    db.session.commit()
+    return 'successfull info '
 if __name__ == '__main__':
     app.run()
     
