@@ -1,5 +1,6 @@
 from flask import Flask, render_template,request
 from flask_sqlalchemy import SQLAlchemy
+import psycopg2
 
 
 app = Flask(__name__)
@@ -104,8 +105,20 @@ def register():
         return render_template('index.html')
     return render_template('index.html', message='You have already register Please login')
  
+@app.route('/login', methods=['POST'])
+def login():
+    useremail = request.form['email']
+    userpas = request.form['pwd']
 
-
+    # print(useremail,userpas)
+    # return render_template('login.html')
+    user = db.session.query(Feedback).filter_by(emailaddress= useremail).first()
+    if user:
+        if user.password == userpas:
+            return render_template('login.html')
+        # print(user)
+        
+    return 'user doesnot exist '
 if __name__ == '__main__':
     app.run()
     

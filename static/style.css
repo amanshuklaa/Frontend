@@ -3,10 +3,19 @@
     background-color: #33B0F2;
 }
 .toppad{
-    padding-top: 312px;
+    display: block; 
+    margin-top: 5%;
 }
 .toppad2main{
    padding-top: 30px;
    padding-left: 126px;
 }
 
+.bg-light{
+    color: #FFFFFF;
+    background-color: #33B0F2;  
+}
+
+.loginhome{
+    padding-left: 80px;
+}
