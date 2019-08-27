@@ -2,8 +2,10 @@ from flask import Flask, render_template,request
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 import base64
-
-
+import io
+from PIL import Image
+from io import BytesIO
+import re
 app = Flask(__name__)
 
 
@@ -30,7 +32,7 @@ class Feedback(db.Model):
     city = db.Column(db.String(200))
     country = db.Column(db.String(200))
     password = db.Column(db.String(200))
-
+   
 
     def __init__(self, name, lastname, emailaddress,gender,city,country,password):
         self.name = name
@@ -40,13 +42,15 @@ class Feedback(db.Model):
         self.city = city
         self.country = country
         self.password = password
+        
 
 class Feedbacks(db.Model):
     __tablename__ = 'product_information'
     id = db.Column(db.Integer, primary_key=True)
     Productname = db.Column(db.String(200), unique=True)
-    image = db.Column(db.String(10000))
+    image = db.Column(db.String(1000000))
     description = db.Column(db.String(2000))
+    
     
 
 
@@ -54,6 +58,7 @@ class Feedbacks(db.Model):
         self.Productname = Productname
         self.image = image
         self.description = description
+        
        
 
 @app.route('/')
@@ -133,16 +138,30 @@ def login():
 
 @app.route('/addproduct',methods= ['POST'])
 def addProduc():
+    
     productname =  request.form['productname']
-    imagefile = request.files['uploadimage']
-    image_string = base64.b64encode(imagefile.read())
+    # print("Posted file: {}".format(request.files['uploadimage']))
+    files = request.files['uploadimage'].read()
+    #print(files)
+    image_string = base64.b64encode(files)
+    # image_string = io.BytesIO(base64.b64encode(files))
+    # print("imagestring",len(image_string))
     description=  request.form['discription']
-    print(productname,image_string,description)
-
+    #print(productname,image_string,description)
+   
+    
     data = Feedbacks(productname, image_string, description)
     db.session.add(data)
     db.session.commit()
-    return 'successfull info '
+    productnamedb = db.session.query(Feedbacks.Productname)
+    productimage = db.session.query(Feedbacks.image)
+    productdescription = db.session.query(Feedbacks.description)
+   
+    
+        
+
+    return render_template('login.html', prodname = productnamedb,img = productimage ,desc = productdescription)
+
 if __name__ == '__main__':
     app.run()
     
